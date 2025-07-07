@@ -1,0 +1,175 @@
+📁 1. base/ — Foundation of the Framework
+✅ What it contains:
+base_page.py: Reusable actions like click, send_keys, get_text, etc. with proper waits.
+
+base_test.py: PyTest setup() fixture to initialize and close the browser.
+
+🔗 Connection:
+pages/ classes inherit from base_page.py.
+
+testcases/ tests use the setup() fixture from base_test.py.
+
+❌ If missing or broken:
+Page methods like click() won’t work.
+
+Test cases will fail to run due to missing WebDriver setup.
+
+📁 2. pages/ — Page Object Classes (POM)
+✅ What it contains:
+Each Python file = one web page (e.g., home_page.py, search_results_page.py).
+
+Contains locators and methods for interacting with that page.
+
+🔗 Connection:
+Uses BasePage methods from base/base_page.py.
+
+Called in test cases from testcases/.
+
+❌ If missing or broken:
+Test cases cannot locate or interact with page elements.
+
+Framework becomes unscalable — tests will mix logic and selectors.
+
+📁 3. testcases/ — Your Actual Test Scripts
+✅ What it contains:
+All real-world test cases (e.g., test_search.py).
+
+Uses page classes to perform actions and assert results.
+
+🔗 Connection:
+Uses page classes from pages/
+
+Uses setup() fixture from base_test.py
+
+Reads from configfiles/config.ini
+
+❌ If missing or broken:
+No automated test can be run.
+
+You'll have setup but no test execution.
+
+📁 4. utilities/ — Reusable Utility Functions
+✅ What it contains:
+custom_logger.py: Logs test status.
+
+wait_utils.py: Extra waits if needed.
+
+🔗 Connection:
+Can be used in pages or testcases to handle logging or complex waits.
+
+Optional but very useful for debugging and maintainability.
+
+❌ If missing or broken:
+Logs will not be saved.
+
+Tests may fail silently without proper logs or screenshots.
+
+📁 5. configfiles/ — Centralized Test Settings
+✅ What it contains:
+config.ini: Stores URL, credentials, search values, etc.
+
+🔗 Connection:
+Used in base_test.py and testcases/ to read environment-specific settings.
+
+❌ If missing or broken:
+Tests will fail due to missing input like base_url, search_item.
+
+Hardcoding these in code is bad practice and limits environment flexibility.
+
+📁 6. testdata/ — Test Inputs for Data-Driven Testing
+✅ What it contains:
+External data files like .json, .csv, .xlsx.
+
+🔗 Connection:
+Can be used in test cases to drive multiple tests with different inputs.
+
+❌ If missing:
+Tests that rely on external data will fail.
+
+Other hardcoded tests will still work.
+
+📁 7. screenshots/ — Error Snapshots
+✅ What it contains:
+Screenshots captured automatically when a step fails.
+
+🔗 Connection:
+Used inside base_page.py to capture UI at failure points.
+
+❌ If folder missing:
+Screenshot saving will raise an exception.
+
+Best practice: always ensure this folder exists.
+
+📁 8. reports/ — Test Logs and HTML Reports
+✅ What it contains:
+HTML report (report.html)
+
+Optional: log file (framework.log from logger)
+
+🔗 Connection:
+pytest.ini saves reports here.
+
+custom_logger.py writes test logs here.
+
+❌ If missing:
+Tests will run, but no logs or reports will be generated.
+
+Debugging failures will be harder.
+
+📁 Other Files
+✅ conftest.py (optional now)
+If needed, holds shared fixtures or hooks for all tests.
+
+✅ pytest.ini
+Configures report generation with HTML format.
+
+✅ requirements.txt
+List of dependencies to set up the environment.
+
+🔄 How Everything Connects: Diagram View
+pgsql
+Copy
+Edit
+testcases/
+│   test_search.py
+│     └── uses HomePage (pages/)
+│     └── uses SearchResultsPage (pages/)
+│     └── uses setup() from base/base_test.py
+│     └── uses config.ini for data
+│     └── uses assertions
+│     └── on failure -> screenshots/, reports/
+|
+pages/
+│   home_page.py --> inherits from base_page.py
+│   search_results_page.py --> inherits from base_page.py
+|
+base/
+│   base_page.py --> reusable click/send_keys
+│   base_test.py --> PyTest setup fixture
+|
+utilities/
+│   custom_logger.py --> logs to reports/
+│   wait_utils.py --> helper wait functions
+|
+configfiles/
+│   config.ini --> URLs, test input
+|
+testdata/
+│   testdata.json --> (optional) for DDT
+|
+screenshots/
+│   fail-safe snapshots (automated)
+|
+reports/
+│   HTML reports + log files
+🧠 Final Notes
+Folder	Mandatory?	If Missing	Recommended Action
+base/	✅ Yes	Framework won’t run	Always include
+pages/	✅ Yes	Tests can't interact with site	Always include
+testcases/	✅ Yes	No automation gets executed	Always include
+configfiles/	✅ Yes	Tests can't read URLs or data	Keep separate
+utilities/	⚠ Optional	Logs may not be created	Include for scale
+screenshots/	⚠ Optional	Debugging harder	Recommended
+reports/	⚠ Optional	You won’t get reports	Recommended
+testdata/	⚠ Optional	No data-driven testing	Add when needed
+
