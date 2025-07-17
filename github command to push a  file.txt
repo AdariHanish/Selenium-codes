@@ -1,0 +1,7 @@
+cd Project_locaation
+git init
+git remote add origin Git_Repository_link
+git add .
+git commit -m "Any kind of message"
+git branch -M main
+git push -u origin main
